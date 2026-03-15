@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0a7a78">
+  <meta name="description" content="LedgerLift CPA Studio - Zero to Hero CPA exam preparation with interactive modules">
+
+  <title>LedgerLift CPA Studio</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="/icons/icon-192.svg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ===== AUTH SCREEN ===== -->
+  <div id="authScreen" class="auth-screen">
+    <div class="auth-container">
+      <div class="auth-brand">
+        <div class="auth-logo">LL</div>
+        <h1>LedgerLift <span class="accent">CPA Studio</span></h1>
+        <p>Zero to Hero &mdash; Your path to becoming a CPA starts here</p>
+      </div>
+
+      <!-- Login Form -->
+      <form id="loginForm" class="auth-form">
+        <h2>Welcome Back</h2>
+        <div class="form-group">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" placeholder="you@example.com" required autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" placeholder="Your password" required autocomplete="current-password">
+        </div>
+        <div id="loginError" class="auth-error hidden"></div>
+        <button type="submit" class="btn btn-primary btn-full">Log In</button>
+        <p class="auth-switch">Don't have an account? <a href="#" id="showSignup">Sign up</a></p>
+      </form>
+
+      <!-- Signup Form -->
+      <form id="signupForm" class="auth-form hidden">
+        <h2>Create Account</h2>
+        <div class="form-group">
+          <label for="signupName">Full Name</label>
+          <input type="text" id="signupName" placeholder="Your name" required autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label for="signupEmail">Email</label>
+          <input type="email" id="signupEmail" placeholder="you@example.com" required autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label for="signupPassword">Password</label>
+          <input type="password" id="signupPassword" placeholder="At least 6 characters" required minlength="6" autocomplete="new-password">
+        </div>
+        <div id="signupError" class="auth-error hidden"></div>
+        <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+        <p class="auth-switch">Already have an account? <a href="#" id="showLogin">Log in</a></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MAIN APP (hidden until authenticated) ===== -->
+  <div id="appShell" class="app-shell hidden">
+
+    <!-- ===== TOP BAR (mobile) ===== -->
+    <header class="top-bar">
+      <div class="top-bar-inner">
+        <div class="top-bar-brand">
+          <span class="top-logo">LL</span>
+          <span class="top-title">LedgerLift</span>
+        </div>
+        <div class="top-bar-right">
+          <span class="user-greeting" id="userGreeting"></span>
+          <button class="btn btn-ghost btn-sm" id="logoutBtn" title="Log out">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== HERO (desktop only) ===== -->
+    <header class="hero desktop-only">
+      <div class="hero-inner">
+        <h1 class="hero-title">LedgerLift <span class="accent">CPA Studio</span></h1>
+        <p class="hero-sub">Zero to Hero &mdash; Master accounting from fundamentals through CPA exam readiness</p>
+        <div class="hero-stats" id="heroStats"></div>
+      </div>
+    </header>
+
+    <!-- ===== NAV (desktop top tabs) ===== -->
+    <nav class="tab-bar desktop-only" id="tabBar">
+      <button class="tab active" data-tab="dashboard">Dashboard</button>
+      <button class="tab" data-tab="learn">Learn</button>
+      <button class="tab" data-tab="practice">Practice</button>
+      <button class="tab" data-tab="games">Games</button>
+      <button class="tab" data-tab="tools">Tools</button>
+      <button class="tab" data-tab="exam">Exam Sim</button>
+      <button class="tab" data-tab="plan">Study Plan</button>
+    </nav>
+
+    <main class="container" id="mainContent">
+
+      <!-- ===== DASHBOARD ===== -->
+      <section class="panel active" id="panelDashboard">
+        <!-- Milestones / Achievement Banner -->
+        <div class="milestone-banner" id="milestoneBanner">
+          <div class="milestone-icon">&#127942;</div>
+          <div class="milestone-text">
+            <strong id="milestoneTitle">Welcome!</strong>
+            <span id="milestoneDesc">Complete your first topic to start earning achievements.</span>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div class="card stat-card">
+            <div class="stat-label">Topics Completed</div>
+            <div class="stat-value" id="statTopics">0 / 0</div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-label">Quiz Accuracy</div>
+            <div class="stat-value" id="statAccuracy">--</div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-label">Study Streak</div>
+            <div class="stat-value" id="statStreak">0 days</div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-label">Games Played</div>
+            <div class="stat-value" id="statGames">0</div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-label">Simulations Done</div>
+            <div class="stat-value" id="statSims">0</div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-label">Exam Readiness</div>
+            <div class="stat-value" id="statReadiness">--</div>
+          </div>
+        </div>
+
+        <!-- Achievements Grid -->
+        <div class="card mt">
+          <h3>Achievements</h3>
+          <div id="achievementsGrid" class="achievements-grid"></div>
+        </div>
+
+        <div class="grid-2 mt">
+          <div class="card">
+            <h3>Weakness Radar</h3>
+            <div id="weaknessChart" class="chart-area"></div>
+          </div>
+          <div class="card">
+            <h3>Recent Activity</h3>
+            <ul id="activityFeed" class="activity-list"></ul>
+          </div>
+        </div>
+
+        <div class="card mt">
+          <h3>CPA Section Progress</h3>
+          <div id="sectionProgress" class="section-progress-grid"></div>
+        </div>
+      </section>
+
+      <!-- ===== LEARN ===== -->
+      <section class="panel" id="panelLearn">
+        <div class="panel-header">
+          <h2>Curriculum</h2>
+          <p class="muted">Complete topics from foundations through CPA mastery. Each lesson includes objectives, key formulas, and practice tips.</p>
+          <div class="filter-row">
+            <select id="learnLevelFilter" class="select-input">
+              <option value="all">All Levels</option>
+            </select>
+            <select id="learnSectionFilter" class="select-input">
+              <option value="all">All CPA Sections</option>
+              <option value="FAR">FAR</option>
+              <option value="AUD">AUD</option>
+              <option value="REG">REG</option>
+              <option value="BEC">BEC</option>
+              <option value="Foundation">Foundation</option>
+            </select>
+          </div>
+        </div>
+        <div id="curriculumList" class="curriculum-grid"></div>
+
+        <!-- Lesson detail modal -->
+        <div id="lessonModal" class="modal hidden">
+          <div class="modal-content lesson-modal">
+            <button class="modal-close" id="lessonClose">&times;</button>
+            <div id="lessonBody"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== PRACTICE ===== -->
+      <section class="panel" id="panelPractice">
+        <div class="sub-tabs" id="practiceSubTabs">
+          <button class="sub-tab active" data-sub="quiz">Knowledge Quiz</button>
+          <button class="sub-tab" data-sub="simulation">Journal Entry Sim</button>
+          <button class="sub-tab" data-sub="adjusting">Adjusting Entries</button>
+          <button class="sub-tab" data-sub="casestudy">Case Studies</button>
+        </div>
+
+        <!-- Quiz -->
+        <div class="sub-panel active" id="subQuiz">
+          <div class="quiz-setup" id="quizSetup">
+            <h3>Configure Your Quiz</h3>
+            <div class="setup-row">
+              <label>Level:
+                <select id="quizLevel" class="select-input">
+                  <option value="all">All Levels</option>
+                </select>
+              </label>
+              <label>CPA Section:
+                <select id="quizSection" class="select-input">
+                  <option value="all">All Sections</option>
+                  <option value="FAR">FAR</option>
+                  <option value="AUD">AUD</option>
+                  <option value="REG">REG</option>
+                  <option value="BEC">BEC</option>
+                </select>
+              </label>
+              <label>Questions:
+                <select id="quizCount" class="select-input">
+                  <option value="5">5</option>
+                  <option value="10" selected>10</option>
+                  <option value="15">15</option>
+                  <option value="20">20</option>
+                  <option value="30">30</option>
+                  <option value="50">50</option>
+                </select>
+              </label>
+            </div>
+            <button id="quizStart" class="btn btn-primary">Start Quiz</button>
+          </div>
+          <div id="quizArea" class="hidden">
+            <div class="quiz-progress-bar"><div id="quizProgressFill" class="quiz-progress-fill"></div></div>
+            <div class="quiz-header">
+              <span id="quizCounter">1 / 10</span>
+              <span id="quizTopic" class="quiz-topic-badge"></span>
+            </div>
+            <div id="quizQuestion" class="quiz-question"></div>
+            <div id="quizChoices" class="quiz-choices"></div>
+            <div id="quizFeedback" class="quiz-feedback hidden"></div>
+            <button id="quizNext" class="btn btn-primary hidden">Next Question</button>
+          </div>
+          <div id="quizResults" class="hidden">
+            <div class="results-card">
+              <h3>Quiz Complete!</h3>
+              <div id="quizScore" class="results-score"></div>
+              <div id="quizBreakdown" class="results-breakdown"></div>
+              <button id="quizRetry" class="btn btn-primary">Try Again</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Simulation -->
+        <div class="sub-panel" id="subSimulation">
+          <div class="sim-setup" id="simSetup">
+            <h3>Journal Entry Simulation</h3>
+            <p class="muted">Practice recording real-world transactions with proper debits and credits.</p>
+            <div class="setup-row">
+              <label>Level:
+                <select id="simLevel" class="select-input">
+                  <option value="all">All Levels</option>
+                </select>
+              </label>
+            </div>
+            <button id="simStart" class="btn btn-primary">Load Scenario</button>
+          </div>
+          <div id="simArea" class="hidden">
+            <div class="sim-scenario">
+              <h4 id="simTitle"></h4>
+              <p id="simDescription" class="sim-desc"></p>
+            </div>
+            <div class="sim-entry-area">
+              <div class="sim-entries" id="simEntries"></div>
+              <button id="simAddRow" class="btn btn-sm">+ Add Row</button>
+            </div>
+            <div class="sim-actions">
+              <button id="simCheck" class="btn btn-primary">Check Entry</button>
+              <button id="simSkip" class="btn btn-ghost">Skip</button>
+            </div>
+            <div id="simFeedback" class="sim-feedback hidden"></div>
+          </div>
+        </div>
+
+        <!-- Adjusting Entries -->
+        <div class="sub-panel" id="subAdjusting">
+          <div id="adjSetup">
+            <h3>Adjusting Entry Workshop</h3>
+            <p class="muted">Practice accruals, deferrals, depreciation, and other period-end adjustments.</p>
+            <button id="adjStart" class="btn btn-primary">Start Workshop</button>
+          </div>
+          <div id="adjArea" class="hidden">
+            <div class="adj-scenario">
+              <span class="adj-type-badge" id="adjType"></span>
+              <h4 id="adjTitle"></h4>
+              <p id="adjDescription"></p>
+            </div>
+            <div class="sim-entry-area">
+              <div class="sim-entries" id="adjEntries"></div>
+              <button id="adjAddRow" class="btn btn-sm">+ Add Row</button>
+            </div>
+            <div class="sim-actions">
+              <button id="adjCheck" class="btn btn-primary">Check Entry</button>
+              <button id="adjNext" class="btn btn-ghost">Next Scenario</button>
+            </div>
+            <div id="adjFeedback" class="sim-feedback hidden"></div>
+          </div>
+        </div>
+
+        <!-- Case Studies (NEW) -->
+        <div class="sub-panel" id="subCasestudy">
+          <div id="caseSetup">
+            <h3>CPA Case Studies</h3>
+            <p class="muted">Work through realistic multi-step accounting scenarios that mirror actual CPA exam task-based simulations.</p>
+            <div class="setup-row">
+              <label>Section:
+                <select id="caseSection" class="select-input">
+                  <option value="all">All Sections</option>
+                  <option value="FAR">FAR</option>
+                  <option value="AUD">AUD</option>
+                  <option value="REG">REG</option>
+                </select>
+              </label>
+            </div>
+            <button id="caseStart" class="btn btn-primary">Start Case Study</button>
+          </div>
+          <div id="caseArea" class="hidden">
+            <div class="case-header">
+              <span class="case-section-badge" id="caseSectionBadge"></span>
+              <span class="case-step-counter" id="caseStepCounter">Step 1 of 3</span>
+            </div>
+            <h4 id="caseTitle"></h4>
+            <div id="caseScenario" class="case-scenario"></div>
+            <div id="caseQuestion" class="case-question"></div>
+            <div id="caseInputArea" class="case-input-area"></div>
+            <div class="sim-actions">
+              <button id="caseCheck" class="btn btn-primary">Submit Answer</button>
+              <button id="caseNext" class="btn btn-ghost hidden">Next Step</button>
+            </div>
+            <div id="caseFeedback" class="sim-feedback hidden"></div>
+          </div>
+          <div id="caseResults" class="hidden">
+            <div class="results-card">
+              <h3>Case Study Complete!</h3>
+              <div id="caseScore" class="results-score"></div>
+              <button id="caseRetry" class="btn btn-primary">Try Another Case</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== GAMES ===== -->
+      <section class="panel" id="panelGames">
+        <h2>Interactive Games</h2>
+        <p class="muted">Learn accounting concepts through engaging mini-games.</p>
+
+        <!-- Game Selector -->
+        <div class="game-selector" id="gameSelector">
+          <div class="game-card" data-game="flashcards">
+            <div class="game-icon">&#x1F4DA;</div>
+            <h4>Flashcards</h4>
+            <p>Master key terms with spaced repetition</p>
+          </div>
+          <div class="game-card" data-game="speed">
+            <div class="game-icon">&#x26A1;</div>
+            <h4>Speed Round</h4>
+            <p>60-second rapid-fire quiz challenge</p>
+          </div>
+          <div class="game-card" data-game="debitcredit">
+            <div class="game-icon">&#x2696;</div>
+            <h4>Debit or Credit?</h4>
+            <p>Classify transactions lightning-fast</p>
+          </div>
+          <div class="game-card" data-game="matching">
+            <div class="game-icon">&#x1F9E9;</div>
+            <h4>Matching Game</h4>
+            <p>Match terms to their definitions</p>
+          </div>
+          <div class="game-card" data-game="sorter">
+            <div class="game-icon">&#x1F4CA;</div>
+            <h4>Account Sorter</h4>
+            <p>Classify accounts into categories</p>
+          </div>
+          <div class="game-card" data-game="equation">
+            <div class="game-icon">&#x1F9EE;</div>
+            <h4>Equation Builder</h4>
+            <p>Balance the accounting equation</p>
+          </div>
+        </div>
+
+        <!-- Flashcards Game -->
+        <div class="game-area hidden" id="gameFlashcards">
+          <div class="game-header">
+            <button class="btn btn-ghost btn-back" id="flashBack">&#8592; Back</button>
+            <h3>Flashcards</h3>
+            <div class="flash-controls">
+              <select id="flashDeck" class="select-input">
+                <option value="all">All Topics</option>
+              </select>
+            </div>
+          </div>
+          <div class="flash-progress" id="flashProgress">0 / 0</div>
+          <div class="flashcard-container">
+            <div class="flashcard" id="flashcard">
+              <div class="flashcard-inner">
+                <div class="flashcard-front" id="flashFront"></div>
+                <div class="flashcard-back" id="flashBack2"></div>
+              </div>
+            </div>
+          </div>
+          <div class="flash-actions">
+            <button class="btn btn-danger" id="flashReview">Need Review</button>
+            <button class="btn btn-ghost" id="flashFlip">Flip Card</button>
+            <button class="btn btn-success" id="flashKnow">Got It!</button>
+          </div>
+        </div>
+
+        <!-- Speed Round Game -->
+        <div class="game-area hidden" id="gameSpeed">
+          <div class="game-header">
+            <button class="btn btn-ghost btn-back" id="speedBack">&#8592; Back</button>
+            <h3>Speed Round</h3>
+          </div>
+          <div id="speedSetup" class="game-setup-center">
+            <div class="speed-best">Best Score: <span id="speedBest">0</span></div>
+            <p>Answer as many questions as you can in 60 seconds!</p>
+            <button id="speedStart" class="btn btn-primary btn-lg">GO!</button>
+          </div>
+          <div id="speedPlay" class="hidden">
+            <div class="speed-hud">
+              <div class="speed-timer" id="speedTimer">60</div>
+              <div class="speed-score">Score: <span id="speedScore">0</span></div>
+              <div class="speed-combo" id="speedCombo"></div>
+            </div>
+            <div id="speedQuestion" class="quiz-question"></div>
+            <div id="speedChoices" class="quiz-choices speed-choices"></div>
+          </div>
+          <div id="speedResults" class="hidden game-setup-center">
+            <h3>Time's Up!</h3>
+            <div class="speed-final-score" id="speedFinalScore">0</div>
+            <p id="speedSummary"></p>
+            <button id="speedRetry" class="btn btn-primary">Play Again</button>
+          </div>
+        </div>
+
+        <!-- Debit/Credit Classifier -->
+        <div class="game-area hidden" id="gameDebitCredit">
+          <div class="game-header">
+            <button class="btn btn-ghost btn-back" id="dcBack">&#8592; Back</button>
+            <h3>Debit or Credit?</h3>
+          </div>
+          <div id="dcPlay">
+            <div class="dc-score-bar">
+              <span>Streak: <strong id="dcStreak">0</strong></span>
+              <span>Score: <strong id="dcScore">0</strong> / <strong id="dcTotal">0</strong></span>
+            </div>
+            <div class="dc-scenario" id="dcScenario"></div>
+            <div class="dc-account" id="dcAccount"></div>
+            <div class="dc-buttons">
+              <button class="btn btn-debit" id="dcDebit">DEBIT</button>
+              <button class="btn btn-credit" id="dcCredit">CREDIT</button>
+            </div>
+            <div id="dcFeedback" class="dc-feedback hidden"></div>
+          </div>
+        </div>
+
+        <!-- Matching Game -->
+        <div class="game-area hidden" id="gameMatching">
+          <div class="game-header">
+            <button class="btn btn-ghost btn-back" id="matchBack">&#8592; Back</button>
+            <h3>Matching Game</h3>
+          </div>
+          <div id="matchSetup" class="game-setup-center">
+            <select id="matchDeck" class="select-input">
+              <option value="0">Set 1: Core Concepts</option>
+              <option value="1">Set 2: Financial Statements</option>
+              <option value="2">Set 3: Audit & Tax</option>
+            </select>
+            <button id="matchStart" class="btn btn-primary">Start Matching</button>
+          </div>
+          <div id="matchPlay" class="hidden">
+            <div class="match-hud">
+              <span>Moves: <strong id="matchMoves">0</strong></span>
+              <span>Pairs: <strong id="matchPairs">0</strong> / <strong id="matchTotal">0</strong></span>
+            </div>
+            <div id="matchGrid" class="match-grid"></div>
+          </div>
+        </div>
+
+        <!-- Account Sorter -->
+        <div class="game-area hidden" id="gameSorter">
+          <div class="game-header">
+            <button class="btn btn-ghost btn-back" id="sorterBack">&#8592; Back</button>
+            <h3>Account Sorter</h3>
+          </div>
+          <div class="sorter-score">
+            Score: <strong id="sorterScore">0</strong> / <strong id="sorterTotal">0</strong>
+          </div>
+          <div class="sorter-account" id="sorterAccount"></div>
+          <div class="sorter-buckets" id="sorterBuckets">
+            <button class="bucket" data-cat="Asset">Asset</button>
+            <button class="bucket" data-cat="Liability">Liability</button>
+            <button class="bucket" data-cat="Equity">Equity</button>
+            <button class="bucket" data-cat="Revenue">Revenue</button>
+            <button class="bucket" data-cat="Expense">Expense</button>
+          </div>
+          <div id="sorterFeedback" class="dc-feedback hidden"></div>
+        </div>
+
+        <!-- Equation Builder -->
+        <div class="game-area hidden" id="gameEquation">
+          <div class="game-header">
+            <button class="btn btn-ghost btn-back" id="eqBack">&#8592; Back</button>
+            <h3>Equation Builder</h3>
+          </div>
+          <div class="eq-display">
+            <div class="eq-side">
+              <div class="eq-label">Assets</div>
+              <div class="eq-value" id="eqAssets">$0</div>
+            </div>
+            <div class="eq-equals">=</div>
+            <div class="eq-side">
+              <div class="eq-label">Liabilities</div>
+              <div class="eq-value" id="eqLiabilities">$0</div>
+            </div>
+            <div class="eq-plus">+</div>
+            <div class="eq-side">
+              <div class="eq-label">Equity</div>
+              <div class="eq-value" id="eqEquity">$0</div>
+            </div>
+          </div>
+          <div class="eq-status" id="eqStatus">Balanced!</div>
+          <div class="eq-scenario" id="eqScenario"></div>
+          <div class="eq-inputs" id="eqInputs"></div>
+          <div class="eq-actions">
+            <button id="eqCheck" class="btn btn-primary">Check</button>
+            <button id="eqNext" class="btn btn-ghost">Next</button>
+          </div>
+          <div id="eqFeedback" class="dc-feedback hidden"></div>
+          <div class="eq-score">Score: <strong id="eqScore">0</strong></div>
+        </div>
+      </section>
+
+      <!-- ===== TOOLS ===== -->
+      <section class="panel" id="panelTools">
+        <h2>Accounting Tools</h2>
+        <p class="muted">Hands-on calculators and worksheets for real-world accounting tasks.</p>
+
+        <div class="sub-tabs" id="toolSubTabs">
+          <button class="sub-tab active" data-sub="ratio">Ratio Analysis</button>
+          <button class="sub-tab" data-sub="depreciation">Depreciation</button>
+          <button class="sub-tab" data-sub="bankrec">Bank Reconciliation</button>
+        </div>
+
+        <!-- Ratio Analysis -->
+        <div class="sub-panel active" id="subRatio">
+          <div class="card">
+            <h3>Financial Ratio Calculator</h3>
+            <p class="muted">Enter financial data to calculate and interpret key ratios.</p>
+            <div class="ratio-inputs">
+              <div class="ratio-group">
+                <h4>Balance Sheet Data</h4>
+                <div class="input-grid">
+                  <label>Cash <input type="number" id="rCash" value="50000" class="num-input"></label>
+                  <label>Accounts Receivable <input type="number" id="rAR" value="80000" class="num-input"></label>
+                  <label>Inventory <input type="number" id="rInventory" value="120000" class="num-input"></label>
+                  <label>Total Current Assets <input type="number" id="rCA" value="260000" class="num-input"></label>
+                  <label>Total Assets <input type="number" id="rTA" value="500000" class="num-input"></label>
+                  <label>Total Current Liabilities <input type="number" id="rCL" value="130000" class="num-input"></label>
+                  <label>Total Liabilities <input type="number" id="rTL" value="200000" class="num-input"></label>
+                  <label>Stockholders' Equity <input type="number" id="rEQ" value="300000" class="num-input"></label>
+                </div>
+              </div>
+              <div class="ratio-group">
+                <h4>Income Statement Data</h4>
+                <div class="input-grid">
+                  <label>Net Sales <input type="number" id="rSales" value="600000" class="num-input"></label>
+                  <label>COGS <input type="number" id="rCOGS" value="360000" class="num-input"></label>
+                  <label>Net Income <input type="number" id="rNI" value="75000" class="num-input"></label>
+                  <label>Interest Expense <input type="number" id="rInterest" value="10000" class="num-input"></label>
+                </div>
+              </div>
+            </div>
+            <button id="ratioCalc" class="btn btn-primary mt">Calculate Ratios</button>
+            <div id="ratioResults" class="ratio-results hidden"></div>
+          </div>
+        </div>
+
+        <!-- Depreciation Calculator -->
+        <div class="sub-panel" id="subDepreciation">
+          <div class="card">
+            <h3>Depreciation Calculator</h3>
+            <p class="muted">Compare depreciation methods side-by-side.</p>
+            <div class="depr-inputs">
+              <label>Asset Cost <input type="number" id="dCost" value="100000" class="num-input"></label>
+              <label>Salvage Value <input type="number" id="dSalvage" value="10000" class="num-input"></label>
+              <label>Useful Life (years) <input type="number" id="dLife" value="5" class="num-input"></label>
+              <label>Total Units (optional) <input type="number" id="dUnits" value="50000" class="num-input"></label>
+            </div>
+            <button id="deprCalc" class="btn btn-primary mt">Calculate All Methods</button>
+            <div id="deprResults" class="hidden"></div>
+          </div>
+        </div>
+
+        <!-- Bank Reconciliation -->
+        <div class="sub-panel" id="subBankrec">
+          <div class="card">
+            <h3>Bank Reconciliation Practice</h3>
+            <p class="muted">Reconcile a bank statement to the book balance.</p>
+            <button id="bankrecStart" class="btn btn-primary">Load Scenario</button>
+            <div id="bankrecArea" class="hidden">
+              <div class="bankrec-scenario" id="bankrecScenario"></div>
+              <div class="bankrec-workspace">
+                <div class="bankrec-col">
+                  <h4>Bank Side</h4>
+                  <div class="bankrec-line">
+                    <span>Bank Statement Balance</span>
+                    <input type="number" id="brBankBal" class="num-input" readonly>
+                  </div>
+                  <div class="bankrec-line">
+                    <span>+ Deposits in Transit</span>
+                    <input type="number" id="brDIT" class="num-input" value="0">
+                  </div>
+                  <div class="bankrec-line">
+                    <span>- Outstanding Checks</span>
+                    <input type="number" id="brOC" class="num-input" value="0">
+                  </div>
+                  <div class="bankrec-line total">
+                    <span>Adjusted Bank Balance</span>
+                    <input type="number" id="brAdjBank" class="num-input" readonly>
+                  </div>
+                </div>
+                <div class="bankrec-col">
+                  <h4>Book Side</h4>
+                  <div class="bankrec-line">
+                    <span>Book Balance</span>
+                    <input type="number" id="brBookBal" class="num-input" readonly>
+                  </div>
+                  <div class="bankrec-line">
+                    <span>+ Interest Earned</span>
+                    <input type="number" id="brInterest" class="num-input" value="0">
+                  </div>
+                  <div class="bankrec-line">
+                    <span>+ Collections</span>
+                    <input type="number" id="brCollections" class="num-input" value="0">
+                  </div>
+                  <div class="bankrec-line">
+                    <span>- Bank Fees</span>
+                    <input type="number" id="brFees" class="num-input" value="0">
+                  </div>
+                  <div class="bankrec-line">
+                    <span>- NSF Checks</span>
+                    <input type="number" id="brNSF" class="num-input" value="0">
+                  </div>
+                  <div class="bankrec-line total">
+                    <span>Adjusted Book Balance</span>
+                    <input type="number" id="brAdjBook" class="num-input" readonly>
+                  </div>
+                </div>
+              </div>
+              <button id="bankrecCheck" class="btn btn-primary mt">Check Reconciliation</button>
+              <div id="bankrecFeedback" class="sim-feedback hidden"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== EXAM SIM ===== -->
+      <section class="panel" id="panelExam">
+        <div id="examSetup">
+          <h2>CPA Exam Simulator</h2>
+          <p class="muted">Simulate real exam conditions with timed, multi-topic assessments.</p>
+          <div class="exam-options">
+            <div class="exam-option-card" data-section="FAR">
+              <h4>FAR</h4>
+              <p>Financial Accounting & Reporting</p>
+              <span class="exam-time">30 min | 20 questions</span>
+            </div>
+            <div class="exam-option-card" data-section="AUD">
+              <h4>AUD</h4>
+              <p>Auditing & Attestation</p>
+              <span class="exam-time">25 min | 15 questions</span>
+            </div>
+            <div class="exam-option-card" data-section="REG">
+              <h4>REG</h4>
+              <p>Regulation</p>
+              <span class="exam-time">25 min | 15 questions</span>
+            </div>
+            <div class="exam-option-card" data-section="MIXED">
+              <h4>Mixed</h4>
+              <p>All Sections Combined</p>
+              <span class="exam-time">45 min | 30 questions</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="examArea" class="hidden">
+          <div class="exam-bar">
+            <div class="exam-timer" id="examTimer">30:00</div>
+            <div class="exam-info">
+              <span id="examSection" class="exam-section-badge"></span>
+              <span id="examProgress">1 / 20</span>
+            </div>
+            <button id="examFlag" class="btn btn-sm btn-ghost">Flag</button>
+          </div>
+          <div class="quiz-progress-bar"><div id="examProgressFill" class="quiz-progress-fill"></div></div>
+          <div id="examQuestion" class="quiz-question"></div>
+          <div id="examChoices" class="quiz-choices"></div>
+          <div class="exam-nav">
+            <button id="examPrev" class="btn btn-ghost">Previous</button>
+            <div id="examDots" class="exam-dots"></div>
+            <button id="examNext2" class="btn btn-primary">Next</button>
+          </div>
+          <button id="examSubmit" class="btn btn-danger hidden">Submit Exam</button>
+        </div>
+
+        <div id="examResults" class="hidden">
+          <div class="results-card exam-results-card">
+            <h3>Exam Results</h3>
+            <div id="examScoreBig" class="exam-score-big"></div>
+            <div id="examResultBreakdown"></div>
+            <button id="examRetry" class="btn btn-primary">Try Another Exam</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== STUDY PLAN ===== -->
+      <section class="panel" id="panelPlan">
+        <h2>Personalized Study Plan</h2>
+        <p class="muted">AI-generated weekly focus based on your performance data.</p>
+        <button id="planRefresh" class="btn btn-primary">Generate Plan</button>
+        <div id="planContent" class="plan-grid mt"></div>
+      </section>
+
+    </main>
+
+    <!-- ===== MOBILE BOTTOM NAV ===== -->
+    <nav class="bottom-nav mobile-only" id="bottomNav">
+      <button class="bottom-nav-item active" data-tab="dashboard">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span>Home</span>
+      </button>
+      <button class="bottom-nav-item" data-tab="learn">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+        <span>Learn</span>
+      </button>
+      <button class="bottom-nav-item" data-tab="practice">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+        <span>Practice</span>
+      </button>
+      <button class="bottom-nav-item" data-tab="games">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+        <span>Games</span>
+      </button>
+      <button class="bottom-nav-item" data-tab="exam">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+        <span>Exam</span>
+      </button>
+      <button class="bottom-nav-item" data-tab="more">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+        <span>More</span>
+      </button>
+    </nav>
+
+    <!-- More Menu Overlay (mobile) -->
+    <div class="more-menu hidden" id="moreMenu">
+      <div class="more-menu-overlay" id="moreMenuOverlay"></div>
+      <div class="more-menu-sheet">
+        <div class="more-menu-header">
+          <h3>More</h3>
+          <button class="modal-close" id="moreMenuClose">&times;</button>
+        </div>
+        <button class="more-menu-item" data-tab="tools">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          Tools
+        </button>
+        <button class="more-menu-item" data-tab="plan">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Study Plan
+        </button>
+        <button class="more-menu-item" id="moreLogout">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Log Out
+        </button>
+      </div>
+    </div>
+
+    <footer class="site-footer desktop-only">
+      <p>LedgerLift CPA Studio &mdash; Built for aspiring CPAs</p>
+    </footer>
+
+  </div><!-- /appShell -->
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

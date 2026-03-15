@@ -1,0 +1,21 @@
+{
+  "name": "ledgerlift-cpa-studio",
+  "version": "2.0.0",
+  "description": "LedgerLift CPA Studio - Interactive accounting games and tools for CPA exam preparation",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^12.8.0",
+    "cookie-parser": "^1.4.7",
+    "express": "^4.21.0",
+    "jsonwebtoken": "^9.0.3",
+    "uuid": "^13.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

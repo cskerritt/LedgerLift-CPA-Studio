@@ -1,0 +1,19 @@
+{
+  "name": "LedgerLift CPA Studio",
+  "short_name": "LedgerLift",
+  "description": "Zero to Hero CPA Exam Preparation - Interactive accounting training platform",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a7a78",
+  "theme_color": "#0a7a78",
+  "orientation": "portrait-primary",
+  "categories": ["education", "finance"],
+  "icons": [
+    { "src": "/icons/icon-192.svg", "sizes": "192x192", "type": "image/svg+xml" },
+    { "src": "/icons/icon-512.svg", "sizes": "512x512", "type": "image/svg+xml" },
+    { "src": "/icons/icon-maskable-192.svg", "sizes": "192x192", "type": "image/svg+xml", "purpose": "maskable" },
+    { "src": "/icons/icon-maskable-512.svg", "sizes": "512x512", "type": "image/svg+xml", "purpose": "maskable" }
+  ],
+  "scope": "/",
+  "lang": "en-US"
+}
