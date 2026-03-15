@@ -92,7 +92,7 @@
     <header class="hero desktop-only">
       <div class="hero-inner">
         <h1 class="hero-title">LedgerLift <span class="accent">CPA Studio</span></h1>
-        <p class="hero-sub">Zero to Hero &mdash; Master accounting from fundamentals through CPA exam readiness</p>
+        <p class="hero-sub">Zero to Hero &mdash; Master all 6 CPA exam sections: AUD, FAR, REG + BAR/ISC/TCP</p>
         <div class="hero-stats" id="heroStats"></div>
       </div>
     </header>
@@ -182,11 +182,16 @@
             </select>
             <select id="learnSectionFilter" class="select-input">
               <option value="all">All CPA Sections</option>
-              <option value="FAR">FAR</option>
-              <option value="AUD">AUD</option>
-              <option value="REG">REG</option>
-              <option value="BEC">BEC</option>
-              <option value="Foundation">Foundation</option>
+              <optgroup label="Core Sections">
+                <option value="AUD">AUD – Auditing & Attestation</option>
+                <option value="FAR">FAR – Financial Accounting & Reporting</option>
+                <option value="REG">REG – Taxation & Regulation</option>
+              </optgroup>
+              <optgroup label="Discipline Sections (pick 1)">
+                <option value="BAR">BAR – Business Analysis & Reporting</option>
+                <option value="ISC">ISC – Information Systems & Controls</option>
+                <option value="TCP">TCP – Tax Compliance & Planning</option>
+              </optgroup>
             </select>
           </div>
         </div>
@@ -223,10 +228,16 @@
               <label>CPA Section:
                 <select id="quizSection" class="select-input">
                   <option value="all">All Sections</option>
-                  <option value="FAR">FAR</option>
-                  <option value="AUD">AUD</option>
-                  <option value="REG">REG</option>
-                  <option value="BEC">BEC</option>
+                  <optgroup label="Core">
+                    <option value="AUD">AUD</option>
+                    <option value="FAR">FAR</option>
+                    <option value="REG">REG</option>
+                  </optgroup>
+                  <optgroup label="Discipline">
+                    <option value="BAR">BAR</option>
+                    <option value="ISC">ISC</option>
+                    <option value="TCP">TCP</option>
+                  </optgroup>
                 </select>
               </label>
               <label>Questions:
@@ -328,9 +339,12 @@
               <label>Section:
                 <select id="caseSection" class="select-input">
                   <option value="all">All Sections</option>
-                  <option value="FAR">FAR</option>
                   <option value="AUD">AUD</option>
+                  <option value="FAR">FAR</option>
                   <option value="REG">REG</option>
+                  <option value="BAR">BAR</option>
+                  <option value="ISC">ISC</option>
+                  <option value="TCP">TCP</option>
                 </select>
               </label>
             </div>
@@ -681,27 +695,58 @@
       <section class="panel" id="panelExam">
         <div id="examSetup">
           <h2>CPA Exam Simulator</h2>
-          <p class="muted">Simulate real exam conditions with timed, multi-topic assessments.</p>
+          <p class="muted">Simulate real 2026 CPA exam conditions. The exam has 3 Core sections (all required) and 3 Discipline sections (choose 1). Each section is 4 hours with MCQs and Task-Based Simulations.</p>
+
+          <h3 class="mt">Core Sections <span class="muted">(all 3 required)</span></h3>
           <div class="exam-options">
-            <div class="exam-option-card" data-section="FAR">
-              <h4>FAR</h4>
-              <p>Financial Accounting & Reporting</p>
-              <span class="exam-time">30 min | 20 questions</span>
-            </div>
             <div class="exam-option-card" data-section="AUD">
               <h4>AUD</h4>
               <p>Auditing & Attestation</p>
-              <span class="exam-time">25 min | 15 questions</span>
+              <span class="exam-time">60 min | 50 MCQs</span>
+              <span class="exam-detail muted">78 MCQs + 7 TBSs on actual exam</span>
+            </div>
+            <div class="exam-option-card" data-section="FAR">
+              <h4>FAR</h4>
+              <p>Financial Accounting & Reporting</p>
+              <span class="exam-time">60 min | 50 MCQs</span>
+              <span class="exam-detail muted">50 MCQs + 7 TBSs on actual exam</span>
             </div>
             <div class="exam-option-card" data-section="REG">
               <h4>REG</h4>
-              <p>Regulation</p>
-              <span class="exam-time">25 min | 15 questions</span>
+              <p>Taxation & Regulation</p>
+              <span class="exam-time">60 min | 50 MCQs</span>
+              <span class="exam-detail muted">72 MCQs + 8 TBSs on actual exam</span>
             </div>
+          </div>
+
+          <h3 class="mt">Discipline Sections <span class="muted">(choose 1)</span></h3>
+          <div class="exam-options">
+            <div class="exam-option-card" data-section="BAR">
+              <h4>BAR</h4>
+              <p>Business Analysis & Reporting</p>
+              <span class="exam-time">60 min | 40 MCQs</span>
+              <span class="exam-detail muted">50 MCQs + 7 TBSs on actual exam</span>
+            </div>
+            <div class="exam-option-card" data-section="ISC">
+              <h4>ISC</h4>
+              <p>Information Systems & Controls</p>
+              <span class="exam-time">60 min | 40 MCQs</span>
+              <span class="exam-detail muted">82 MCQs + 6 TBSs on actual exam</span>
+            </div>
+            <div class="exam-option-card" data-section="TCP">
+              <h4>TCP</h4>
+              <p>Tax Compliance & Planning</p>
+              <span class="exam-time">60 min | 40 MCQs</span>
+              <span class="exam-detail muted">68 MCQs + 7 TBSs on actual exam</span>
+            </div>
+          </div>
+
+          <h3 class="mt">Practice Mode</h3>
+          <div class="exam-options">
             <div class="exam-option-card" data-section="MIXED">
               <h4>Mixed</h4>
               <p>All Sections Combined</p>
-              <span class="exam-time">45 min | 30 questions</span>
+              <span class="exam-time">60 min | 50 MCQs</span>
             </div>
           </div>
         </div>
@@ -804,6 +849,7 @@
   </div><!-- /appShell -->
 
   <script src="data.js"></script>
+  <script src="data2.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

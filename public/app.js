@@ -559,7 +559,7 @@
     const grid = $('#sectionProgress');
     if (!grid) return;
     grid.innerHTML = '';
-    const sections = ['Foundation', 'FAR', 'AUD', 'REG', 'BEC'];
+    const sections = ['FAR', 'AUD', 'REG', 'BAR', 'ISC', 'TCP'];
     sections.forEach(sec => {
       const topics = allTopics().filter(t => t.cpaSection === sec);
       if (topics.length === 0) return;
@@ -1888,10 +1888,13 @@
   function startExam(section) {
     const bank = typeof QUESTION_BANK !== 'undefined' ? QUESTION_BANK : [];
     const configs = {
-      FAR: { time: 30, count: 20 },
-      AUD: { time: 25, count: 15 },
-      REG: { time: 25, count: 15 },
-      MIXED: { time: 45, count: 30 }
+      FAR: { time: 60, count: 50, label: 'FAR – Financial Accounting & Reporting (Core)' },
+      AUD: { time: 60, count: 50, label: 'AUD – Auditing & Attestation (Core)' },
+      REG: { time: 60, count: 50, label: 'REG – Taxation & Regulation (Core)' },
+      BAR: { time: 60, count: 40, label: 'BAR – Business Analysis & Reporting (Discipline)' },
+      ISC: { time: 60, count: 40, label: 'ISC – Information Systems & Controls (Discipline)' },
+      TCP: { time: 60, count: 40, label: 'TCP – Tax Compliance & Planning (Discipline)' },
+      MIXED: { time: 60, count: 50, label: 'Mixed – All Sections Combined' }
     };
     const cfg = configs[section] || configs.MIXED;
 

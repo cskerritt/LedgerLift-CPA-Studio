@@ -1,0 +1,9 @@
+node_modules
+.git
+.DS_Store
+*.db
+*.db-shm
+*.db-wal
+.env
+.claude
+docker-compose.yml
