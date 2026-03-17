@@ -45,6 +45,8 @@
         <div id="loginError" class="auth-error hidden"></div>
         <button type="submit" class="btn btn-primary btn-full">Log In</button>
         <p class="auth-switch">Don't have an account? <a href="#" id="showSignup">Sign up</a></p>
+        <div class="auth-divider"><span>or</span></div>
+        <button type="button" class="btn btn-ghost btn-full" id="guestBtn">Continue as Guest</button>
       </form>
 
       <!-- Signup Form -->
@@ -174,20 +176,24 @@
       <!-- ===== LEARN ===== -->
       <section class="panel" id="panelLearn">
         <div class="panel-header">
-          <h2>Curriculum</h2>
-          <p class="muted">Complete topics from foundations through CPA mastery. Each lesson includes objectives, key formulas, and practice tips.</p>
+          <h2>Learn</h2>
+          <p class="muted">Work through each topic step by step. Lessons are written in plain English with easy-to-follow explanations. Just pick a section, start at the top, and work your way down.</p>
           <div class="filter-row">
             <select id="learnLevelFilter" class="select-input">
               <option value="all">All Levels</option>
             </select>
             <select id="learnSectionFilter" class="select-input">
-              <option value="all">All CPA Sections</option>
-              <optgroup label="Core Sections">
+              <option value="all">All Sections</option>
+              <optgroup label="Foundations">
+                <option value="BASICS">Accounting Basics</option>
+                <option value="INTM">Intermediate Accounting</option>
+              </optgroup>
+              <optgroup label="CPA Exam – Core">
                 <option value="AUD">AUD – Auditing & Attestation</option>
                 <option value="FAR">FAR – Financial Accounting & Reporting</option>
                 <option value="REG">REG – Taxation & Regulation</option>
               </optgroup>
-              <optgroup label="Discipline Sections (pick 1)">
+              <optgroup label="CPA Exam – Discipline (pick 1)">
                 <option value="BAR">BAR – Business Analysis & Reporting</option>
                 <option value="ISC">ISC – Information Systems & Controls</option>
                 <option value="TCP">TCP – Tax Compliance & Planning</option>

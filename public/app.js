@@ -239,6 +239,15 @@
       }
     };
 
+    // Guest mode
+    const guestBtn = $('#guestBtn');
+    if (guestBtn) {
+      guestBtn.onclick = () => {
+        currentUser = { id: 'guest', name: 'Guest', email: '' };
+        enterApp();
+      };
+    }
+
     // Logout
     const logoutHandler = async () => {
       try { await fetch('/api/logout', { method: 'POST' }); } catch (e) {}
@@ -608,23 +617,45 @@
     const levelFilter = $('#learnLevelFilter').value;
     const sectionFilter = $('#learnSectionFilter').value;
 
+    /* Overall progress summary */
+    const allTopics = getAllTopics(sectionFilter);
+    const completedCount = allTopics.filter(t => progress.completedTopics.includes(t.id)).length;
+    const pct = allTopics.length ? Math.round((completedCount / allTopics.length) * 100) : 0;
+
+    const summary = el('div', 'curriculum-summary');
+    summary.innerHTML = `
+      <div class="curriculum-progress-bar"><div class="curriculum-progress-fill" style="width:${pct}%"></div></div>
+      <p class="curriculum-progress-text">${completedCount} of ${allTopics.length} topics completed (${pct}%)</p>
+    `;
+    grid.appendChild(summary);
+
+    let globalIndex = 0;
+
     CURRICULUM.forEach(level => {
       if (levelFilter !== 'all' && level.level !== levelFilter) return;
       const topics = level.topics.filter(t => sectionFilter === 'all' || t.cpaSection === sectionFilter);
       if (topics.length === 0) return;
 
+      const sectionDone = topics.filter(t => progress.completedTopics.includes(t.id)).length;
       const section = el('div', 'curriculum-section');
-      section.innerHTML = `<h3 class="curriculum-level">${level.level}</h3>`;
+      section.innerHTML = `
+        <h3 class="curriculum-level">${level.title}</h3>
+        <p class="curriculum-section-progress">${sectionDone} of ${topics.length} complete</p>
+      `;
       const topicGrid = el('div', 'topic-grid');
 
       topics.forEach(topic => {
+        globalIndex++;
         const done = progress.completedTopics.includes(topic.id);
         const card = el('div', `topic-card ${done ? 'completed' : ''}`);
         card.innerHTML = `
-          <span class="topic-badge">${topic.cpaSection}</span>
+          <div class="topic-card-header">
+            <span class="topic-number">${globalIndex}</span>
+            <span class="topic-badge">${topic.cpaSection}</span>
+          </div>
           <h4>${topic.title}</h4>
           <p class="muted">${topic.objectives[0]}</p>
-          <span class="topic-status">${done ? 'Completed' : 'Start'} &rarr;</span>
+          <span class="topic-status">${done ? 'Completed' : 'Start Learning'} &rarr;</span>
         `;
         card.onclick = () => openLesson(topic);
         topicGrid.appendChild(card);
@@ -634,37 +665,88 @@
     });
   }
 
+  /* Build flat ordered list of all topics for sequential navigation */
+  function getAllTopics(sectionFilter) {
+    const topics = [];
+    CURRICULUM.forEach(level => {
+      level.topics.forEach(t => {
+        if (!sectionFilter || sectionFilter === 'all' || t.cpaSection === sectionFilter) {
+          topics.push(t);
+        }
+      });
+    });
+    return topics;
+  }
+
   function openLesson(topic) {
     const modal = $('#lessonModal');
     const body = $('#lessonBody');
     const done = progress.completedTopics.includes(topic.id);
 
+    /* Get current filter context for navigation */
+    const sectionFilter = $('#learnSectionFilter') ? $('#learnSectionFilter').value : 'all';
+    const allTopics = getAllTopics(sectionFilter);
+    const currentIndex = allTopics.findIndex(t => t.id === topic.id);
+    const totalTopics = allTopics.length;
+    const completedInSet = allTopics.filter(t => progress.completedTopics.includes(t.id)).length;
+    const hasPrev = currentIndex > 0;
+    const hasNext = currentIndex < totalTopics - 1;
+
     body.innerHTML = `
+      <div class="lesson-progress-bar">
+        <div class="lesson-progress-fill" style="width: ${Math.round((completedInSet / totalTopics) * 100)}%"></div>
+      </div>
+      <div class="lesson-progress-text">${completedInSet} of ${totalTopics} topics completed</div>
       <span class="topic-badge">${topic.cpaSection}</span>
+      <span class="lesson-position">Topic ${currentIndex + 1} of ${totalTopics}</span>
       <h2>${topic.title}</h2>
       <div class="lesson-objectives">
-        <h4>Learning Objectives</h4>
+        <h4>What You'll Learn</h4>
         <ul>${topic.objectives.map(o => `<li>${o}</li>`).join('')}</ul>
       </div>
-      ${topic.keyFormula ? `<div class="lesson-formula"><strong>Key Formula:</strong> ${topic.keyFormula}</div>` : ''}
+      ${topic.keyFormula ? `<div class="lesson-formula"><strong>Key Concept:</strong> ${topic.keyFormula}</div>` : ''}
       <div class="lesson-content">${topic.lesson}</div>
-      ${topic.practiceTip ? `<div class="lesson-tip"><strong>Practice Tip:</strong> ${topic.practiceTip}</div>` : ''}
-      <button class="btn ${done ? 'btn-ghost' : 'btn-primary'} mt" id="markComplete">
-        ${done ? 'Completed' : 'Mark as Complete'}
-      </button>
+      ${topic.practiceTip ? `<div class="lesson-tip"><strong>Quick Tip:</strong> ${topic.practiceTip}</div>` : ''}
+      <div class="lesson-actions">
+        <button class="btn ${done ? 'btn-ghost' : 'btn-primary'}" id="markComplete">
+          ${done ? 'Completed' : 'Mark as Complete & Continue'}
+        </button>
+      </div>
+      <div class="lesson-nav">
+        <button class="btn btn-ghost lesson-nav-btn" id="lessonPrev" ${!hasPrev ? 'disabled' : ''}>
+          &larr; Previous
+        </button>
+        <button class="btn btn-primary lesson-nav-btn" id="lessonNext" ${!hasNext ? 'disabled' : ''}>
+          Next Topic &rarr;
+        </button>
+      </div>
     `;
 
     modal.classList.remove('hidden');
+    body.scrollTop = 0;
+
     $('#markComplete').onclick = () => {
       if (!progress.completedTopics.includes(topic.id)) {
         progress.completedTopics.push(topic.id);
         logEvent(`Completed topic: ${topic.title}`);
         save();
       }
-      modal.classList.add('hidden');
-      renderCurriculum();
+      /* Auto-advance to next topic if available */
+      if (hasNext) {
+        openLesson(allTopics[currentIndex + 1]);
+      } else {
+        modal.classList.add('hidden');
+        renderCurriculum();
+      }
     };
-    $('#lessonClose').onclick = () => modal.classList.add('hidden');
+
+    $('#lessonPrev').onclick = () => {
+      if (hasPrev) openLesson(allTopics[currentIndex - 1]);
+    };
+    $('#lessonNext').onclick = () => {
+      if (hasNext) openLesson(allTopics[currentIndex + 1]);
+    };
+    $('#lessonClose').onclick = () => { modal.classList.add('hidden'); renderCurriculum(); };
   }
 
   /* =================================================================
