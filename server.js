@@ -11,14 +11,22 @@ const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'ledgerlift-secret-' + require('crypto').randomBytes(16).toString('hex');
 
 // ---------- Database Setup (PostgreSQL) ----------
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.DATABASE_URL && process.env.DATABASE_URL.includes('railway')
-    ? { rejectUnauthorized: false }
-    : false
-});
+if (!process.env.DATABASE_URL) {
+  console.error('WARNING: DATABASE_URL is not set. Database features will be unavailable.');
+}
+
+const pool = process.env.DATABASE_URL
+  ? new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false }
+    })
+  : null;
 
 async function initDB() {
+  if (!pool) {
+    console.log('Skipping database initialization (DATABASE_URL not set)');
+    return;
+  }
   const client = await pool.connect();
   try {
     await client.query(`
@@ -48,6 +56,12 @@ app.use(express.json({ limit: '2mb' }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Database availability middleware
+function requireDB(req, res, next) {
+  if (!pool) return res.status(503).json({ error: 'Database not configured' });
+  next();
+}
+
 // Auth middleware
 function authenticate(req, res, next) {
   const token = req.cookies.token || req.headers.authorization?.replace('Bearer ', '');
@@ -63,7 +77,7 @@ function authenticate(req, res, next) {
 }
 
 // ---------- Auth Routes ----------
-app.post('/api/register', async (req, res) => {
+app.post('/api/register', requireDB, async (req, res) => {
   try {
     const { email, name, password } = req.body;
 
@@ -110,7 +124,7 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-app.post('/api/login', async (req, res) => {
+app.post('/api/login', requireDB, async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -146,7 +160,7 @@ app.post('/api/logout', (req, res) => {
   res.json({ ok: true });
 });
 
-app.get('/api/me', authenticate, async (req, res) => {
+app.get('/api/me', requireDB, authenticate, async (req, res) => {
   try {
     const result = await pool.query('SELECT id, email, name, created_at FROM users WHERE id = $1', [req.user.id]);
     const user = result.rows[0];
@@ -159,7 +173,7 @@ app.get('/api/me', authenticate, async (req, res) => {
 });
 
 // ---------- Progress Sync Routes ----------
-app.get('/api/progress', authenticate, async (req, res) => {
+app.get('/api/progress', requireDB, authenticate, async (req, res) => {
   try {
     const result = await pool.query('SELECT data, updated_at FROM progress WHERE user_id = $1', [req.user.id]);
     const row = result.rows[0];
@@ -171,7 +185,7 @@ app.get('/api/progress', authenticate, async (req, res) => {
   }
 });
 
-app.put('/api/progress', authenticate, async (req, res) => {
+app.put('/api/progress', requireDB, authenticate, async (req, res) => {
   try {
     const { data } = req.body;
     if (!data) return res.status(400).json({ error: 'Progress data required' });
@@ -190,6 +204,7 @@ app.put('/api/progress', authenticate, async (req, res) => {
 
 // ---------- Health Check ----------
 app.get('/api/health', async (req, res) => {
+  if (!pool) return res.json({ status: 'ok', db: 'not configured' });
   try {
     await pool.query('SELECT 1');
     res.json({ status: 'ok', db: 'connected' });
@@ -209,6 +224,9 @@ initDB().then(() => {
     console.log(`LedgerLift CPA Studio running on port ${PORT}`);
   });
 }).catch(err => {
-  console.error('Failed to initialize database:', err);
-  process.exit(1);
+  console.error('Database initialization failed:', err.message);
+  console.log('Starting server without database...');
+  app.listen(PORT, () => {
+    console.log(`LedgerLift CPA Studio running on port ${PORT} (no database)`);
+  });
 });
